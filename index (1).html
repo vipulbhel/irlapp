@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRL — Not A Dating App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0810;
+  --card:#160F1A;
+  --rose:#E8437A;
+  --rose2:#FF6B9D;
+  --cream:#F5EDE8;
+  --muted:#8A7A82;
+  --border:rgba(245,237,232,0.08);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;overflow-x:hidden;min-height:100vh}
+
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.ambient::before{content:'';position:absolute;top:-20%;right:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(232,67,122,0.09) 0%,transparent 65%)}
+.ambient::after{content:'';position:absolute;bottom:-10%;left:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(120,40,90,0.06) 0%,transparent 65%)}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;transition:background 0.4s}
+nav.scrolled{background:rgba(13,8,16,0.93);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-1px}
+.logo span{color:var(--rose)}
+.nav-pill{display:flex;align-items:center;gap:7px;border:1px solid rgba(232,67,122,0.25);border-radius:100px;padding:7px 14px;font-size:10px;color:var(--rose2);letter-spacing:1.5px;text-transform:uppercase;font-weight:500;background:rgba(232,67,122,0.06)}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--rose);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(232,67,122,0.5)}60%{opacity:0.6;box-shadow:0 0 0 6px rgba(232,67,122,0)}}
+
+/* ── HERO ── */
+.hero{
+  position:relative;min-height:100svh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:110px 24px 60px;
+  z-index:1;overflow:hidden;
+}
+
+/* floating cards — left and right on desktop, hidden on mobile */
+.float-left,.float-right{
+  display:none;
+  position:absolute;
+  top:50%;transform:translateY(-50%);
+  flex-direction:column;gap:12px;
+  pointer-events:none;
+  opacity:0;animation:fadeup 1s 1s forwards;
+}
+.float-left{left:32px}
+.float-right{right:32px}
+
+.fc{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;width:190px}
+.fc:nth-child(odd){animation:floatA 6s ease-in-out infinite}
+.fc:nth-child(even){animation:floatB 6s ease-in-out infinite;margin-left:20px}
+@keyframes floatA{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes floatB{0%,100%{transform:translateY(-6px)}50%{transform:translateY(4px)}}
+.fc-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:1.5px solid rgba(232,67,122,0.2)}
+.fc-name{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--cream);line-height:1.2}
+.fc-sub{font-size:9px;color:var(--muted);margin-top:1px}
+.fc-dot{width:7px;height:7px;border-radius:50%;background:var(--rose);margin-left:auto;flex-shrink:0;box-shadow:0 0 6px rgba(232,67,122,0.7)}
+
+/* hero headline — centered */
+.hero-h1{
+  font-family:'Syne',sans-serif;
+  font-weight:800;line-height:0.93;
+  letter-spacing:-3px;
+  margin-bottom:24px;
+  position:relative;z-index:2;
+}
+.l1,.l2,.l3{display:block;opacity:0;transform:translateY(60px)}
+.l1{animation:slideup 0.8s 0.15s cubic-bezier(0.16,1,0.3,1) forwards}
+.l2{animation:slideup 0.8s 0.28s cubic-bezier(0.16,1,0.3,1) forwards;color:transparent;-webkit-text-stroke:2px rgba(245,237,232,0.18)}
+.l3{animation:slideup 0.8s 0.42s cubic-bezier(0.16,1,0.3,1) forwards;color:var(--rose);font-style:italic;font-weight:400}
+
+/* event hint pill */
+.event-hint{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(232,67,122,0.08);
+  border:1px solid rgba(232,67,122,0.18);
+  border-radius:100px;padding:7px 16px;
+  font-size:11px;color:var(--rose2);
+  margin-bottom:28px;
+  opacity:0;animation:fadeup 0.8s 0.55s forwards;
+  position:relative;z-index:2;
+}
+
+/* counter */
+.counter-strip{width:100%;max-width:480px;margin-bottom:16px;opacity:0;animation:fadeup 0.8s 0.65s forwards;position:relative;z-index:2}
+.counter-inner{display:flex;align-items:center;gap:14px;padding:14px 18px;background:rgba(232,67,122,0.07);border:1px solid rgba(232,67,122,0.18);border-radius:14px}
+.c-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--rose);letter-spacing:-1px;line-height:1;min-width:54px;transition:transform 0.3s,opacity 0.3s}
+.c-divider{width:1px;height:36px;background:var(--border);flex-shrink:0}
+.c-text{flex:1;font-size:12px;color:var(--muted);line-height:1.4;text-align:left}
+.c-text b{color:var(--cream);display:block;font-size:13px;margin-bottom:1px}
+.c-spots{font-family:'Syne',sans-serif;font-size:10px;color:var(--muted);text-align:right;flex-shrink:0}
+.c-spots b{display:block;font-size:20px;font-weight:800;color:var(--rose);letter-spacing:-1px;line-height:1;margin-bottom:1px}
+
+/* form */
+.form-block{display:flex;flex-direction:column;gap:10px;width:100%;max-width:480px;opacity:0;animation:fadeup 0.8s 0.75s forwards;position:relative;z-index:2}
+input,select{background:rgba(245,237,232,0.04);border:1px solid rgba(245,237,232,0.1);border-radius:13px;padding:16px 18px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--cream);outline:none;width:100%;-webkit-appearance:none;transition:border-color 0.2s,background 0.2s}
+input::placeholder{color:#3a3040}
+input:focus,select:focus{border-color:rgba(232,67,122,0.5);background:rgba(232,67,122,0.04)}
+select option{background:#160F1A;color:var(--cream)}
+.sub-btn{background:linear-gradient(135deg,var(--rose),#C4306A);border:none;border-radius:13px;padding:18px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:white;cursor:pointer;transition:transform 0.15s,opacity 0.15s,box-shadow 0.2s;box-shadow:0 8px 32px rgba(232,67,122,0.25)}
+.sub-btn:hover{opacity:0.9;transform:scale(0.998);box-shadow:0 14px 40px rgba(232,67,122,0.4)}
+.sub-btn:active{transform:scale(0.97)}
+.form-note{display:flex;justify-content:center;gap:16px;font-size:10px;color:#3a3040}
+.form-note span::before{content:'✓ ';color:#5a4560}
+
+.success-box{display:none;background:rgba(232,67,122,0.07);border:1px solid rgba(232,67,122,0.2);border-radius:16px;padding:32px;text-align:center;width:100%;max-width:480px;position:relative;z-index:2}
+.success-box.show{display:block;animation:fadeup 0.5s forwards}
+.s-pos{font-family:'Syne',sans-serif;font-size:60px;font-weight:800;color:var(--rose);letter-spacing:-4px;line-height:1;margin-bottom:8px}
+.success-box h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px}
+.success-box p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── WHAT'S DIFFERENT ── */
+.diff-section{position:relative;z-index:1;padding:72px 24px;border-top:1px solid var(--border)}
+.sec-kicker{font-size:10px;color:var(--rose);letter-spacing:3px;text-transform:uppercase;font-weight:600;margin-bottom:14px}
+.diff-h2{font-family:'Syne',sans-serif;font-size:clamp(28px,7vw,36px);font-weight:800;letter-spacing:-1.5px;line-height:1.05;margin-bottom:28px}
+.diff-h2 em{font-style:italic;color:var(--rose);font-weight:400}
+.diff-cards{display:flex;flex-direction:column;gap:12px}
+.d-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.2s}
+.d-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--rose);transform:scaleY(0);transform-origin:top;transition:transform 0.4s}
+.d-card:hover{border-color:rgba(232,67,122,0.25);transform:translateX(4px)}
+.d-card:hover::before{transform:scaleY(1)}
+.d-icon{width:42px;height:42px;border-radius:12px;background:rgba(232,67,122,0.1);border:1px solid rgba(232,67,122,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.d-card h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;letter-spacing:-0.3px;color:var(--cream);margin-bottom:2px}
+.d-card p{font-size:13px;color:var(--muted);line-height:1.5;font-weight:300}
+
+/* ── DON'T MISS ── */
+.miss{position:relative;z-index:1;padding:90px 24px;border-top:1px solid var(--border);text-align:center;overflow:hidden}
+.miss::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:300px;background:radial-gradient(ellipse,rgba(232,67,122,0.09) 0%,transparent 70%);pointer-events:none}
+.miss-h2{font-family:'Syne',sans-serif;font-size:clamp(44px,12vw,80px);font-weight:800;letter-spacing:-4px;line-height:0.92;margin-bottom:16px;position:relative}
+.miss-h2 em{font-style:italic;color:var(--rose);display:block}
+.miss-h2 .hollow{-webkit-text-stroke:1.5px rgba(245,237,232,0.12);color:transparent}
+.miss-sub{font-size:14px;color:var(--muted);margin-bottom:32px;line-height:1.6;max-width:300px;margin-left:auto;margin-right:auto;font-weight:300;position:relative}
+.miss-sub b{color:var(--cream)}
+.cta-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--rose),#C4306A);color:white;padding:17px 36px;border-radius:100px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:transform 0.15s,box-shadow 0.2s;box-shadow:0 8px 32px rgba(232,67,122,0.3)}
+.cta-btn:hover{transform:scale(0.98);box-shadow:0 14px 40px rgba(232,67,122,0.4)}
+.cta-arr{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;transition:transform 0.25s}
+.cta-btn:hover .cta-arr{transform:rotate(45deg)}
+.miss-bottom{margin-top:16px;font-size:11px;color:#3a3040}
+
+footer{position:relative;z-index:1;padding:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+footer p{font-size:11px;color:#3a3040}
+
+/* ── DESKTOP ── */
+@media(min-width:768px){
+  nav{padding:24px 48px}
+
+  .hero{padding:100px 280px 80px;min-height:100svh}
+  .hero-h1{font-size:clamp(64px,7.5vw,100px);letter-spacing:-5px}
+
+  .float-left,.float-right{display:flex}
+
+  .diff-section{padding:100px 48px}
+  .diff-cards{flex-direction:row;gap:16px}
+  .d-card{flex:1;flex-direction:column;align-items:flex-start;gap:14px}
+  .d-card:hover{transform:translateY(-4px)}
+  .d-card::before{top:0;left:0;right:0;bottom:auto;width:auto;height:2px;transform:scaleX(0);transform-origin:left}
+  .d-card:hover::before{transform:scaleX(1)}
+
+  .miss{padding:120px 48px}
+  footer{padding:32px 48px}
+}
+
+@keyframes fadeup{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideup{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity 0.65s,transform 0.65s}
+.reveal.in{opacity:1;transform:translateY(0)}
+.d1{transition-delay:0.1s}.d2{transition-delay:0.2s}
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<nav id="nav">
+  <div class="logo">ir<span>l</span></div>
+  <div class="nav-pill"><div class="live-dot"></div>500 Spots Only</div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+
+  <!-- floating cards left (desktop) -->
+  <div class="float-left">
+    <div class="fc">
+      <div class="fc-av" style="background:linear-gradient(135deg,#2D1B33,#4A2040)">🌸</div>
+      <div><div class="fc-name">Riya, 24</div><div class="fc-sub">Mumbai · Verified ✓</div></div>
+      <div class="fc-dot"></div>
+    </div>
+    <div class="fc">
+      <div class="fc-av" style="background:linear-gradient(135deg,#1B2D22,#204A30)">🌿</div>
+      <div><div class="fc-name">Kabir, 27</div><div class="fc-sub">Delhi · Verified ✓</div></div>
+      <div class="fc-dot"></div>
+    </div>
+  </div>
+
+  <!-- floating cards right (desktop) -->
+  <div class="float-right">
+    <div class="fc">
+      <div class="fc-av" style="background:linear-gradient(135deg,#2A1B33,#3D2050)">✨</div>
+      <div><div class="fc-name">Meera, 25</div><div class="fc-sub">Bengaluru · Verified ✓</div></div>
+      <div class="fc-dot"></div>
+    </div>
+    <div class="fc">
+      <div class="fc-av" style="background:linear-gradient(135deg,#1B2433,#20304A)">🌊</div>
+      <div><div class="fc-name">Aryan, 26</div><div class="fc-sub">Pune · Verified ✓</div></div>
+      <div class="fc-dot"></div>
+    </div>
+  </div>
+
+  <!-- centered headline -->
+  <h1 class="hero-h1">
+    <span class="l1">It's not a</span>
+    <span class="l2">dating app.</span>
+    <span class="l3">find out.</span>
+  </h1>
+
+  <!-- subtle events pill -->
+  <div class="event-hint">
+    🎉 <span>Real people. Real city. Real life.</span>
+  </div>
+
+  <!-- counter -->
+  <div class="counter-strip">
+    <div class="counter-inner">
+      <div class="c-num" id="cNum">247</div>
+      <div class="c-divider"></div>
+      <div class="c-text">
+        <b>People already waiting</b>
+        Mumbai · Delhi · Bengaluru
+      </div>
+      <div class="c-spots">
+        <b id="cSpots">253</b>
+        spots left
+      </div>
+    </div>
+  </div>
+
+  <!-- form -->
+  <div class="form-block" id="formBlock">
+    <input type="tel" id="phone" placeholder="+91 your number" maxlength="10"/>
+    <select id="city">
+      <option value="" disabled selected>Your city</option>
+      <option>Mumbai</option><option>Delhi</option><option>Bengaluru</option>
+      <option>Hyderabad</option><option>Pune</option><option>Chennai</option>
+      <option>Kolkata</option><option>Other</option>
+    </select>
+    <button class="sub-btn" onclick="joinWaitlist()">Claim My Spot →</button>
+    <div class="form-note">
+      <span>Verified only</span>
+      <span>No spam</span>
+      <span>100% free</span>
+    </div>
+  </div>
+
+  <div class="success-box" id="successBox">
+    <div class="s-pos" id="sPos">#248</div>
+    <h3>You're in. 🔥</h3>
+    <p>We'll WhatsApp when your invite drops.<br>Tell one friend — they'll thank you.</p>
+  </div>
+
+</section>
+
+<!-- ══ WHAT'S DIFFERENT ══ -->
+<section class="diff-section">
+  <div class="sec-kicker reveal">Why IRL hits different</div>
+  <h2 class="diff-h2 reveal d1">Three things.<br>No app has <em>ever</em> done.</h2>
+  <div class="diff-cards">
+    <div class="d-card reveal">
+      <div class="d-icon">🛡️</div>
+      <div><h3>Everyone is real.</h3><p>Identity verified. No fakes. No ghosts.</p></div>
+    </div>
+    <div class="d-card reveal d1">
+      <div class="d-icon">💬</div>
+      <div><h3>A whole new intro.</h3><p>Not a photo. Not a bio. Something better.</p></div>
+    </div>
+    <div class="d-card reveal d2">
+      <div class="d-icon">📍</div>
+      <div><h3>Actually meet.</h3><p>Exclusive events in your city. Monthly.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DON'T MISS ══ -->
+<section class="miss">
+  <h2 class="miss-h2 reveal">
+    Don't
+    <em>miss out.</em>
+    <span class="hollow">For real.</span>
+  </h2>
+  <p class="miss-sub reveal d1"><b>500 spots.</b> Once gone, you're on the outside.</p>
+  <button class="cta-btn reveal d2" onclick="scrollToForm()">
+    Get My Invite
+    <div class="cta-arr">→</div>
+  </button>
+  <div class="miss-bottom reveal"><span id="bCount">247</span> waiting · <span id="bSpots">253</span> left</div>
+</section>
+
+<footer>
+  <div class="logo" style="font-size:18px">ir<span style="color:var(--rose)">l</span></div>
+  <p>Built with intent, not algorithms.</p>
+</footer>
+
+<script>
+window.addEventListener('scroll',()=>
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40)
+);
+
+let count=247;
+function setCount(n){
+  count=n;
+  const el=document.getElementById('cNum');
+  el.style.opacity='0';el.style.transform='translateY(-6px)';
+  setTimeout(()=>{
+    el.textContent=n;
+    el.style.transition='transform 0.3s,opacity 0.3s';
+    el.style.opacity='1';el.style.transform='translateY(0)';
+  },150);
+  document.getElementById('cSpots').textContent=500-n;
+  document.getElementById('bCount').textContent=n;
+  document.getElementById('bSpots').textContent=500-n;
+}
+(function tick(){setTimeout(()=>{if(count<490)setCount(count+1);tick();},Math.random()*20000+12000)})();
+
+function joinWaitlist(){
+  const p=document.getElementById('phone');
+  const c=document.getElementById('city');
+  if(!p.value||p.value.length<10){
+    p.style.borderColor='rgba(232,67,122,0.7)';
+    p.style.animation='shake 0.4s';
+    setTimeout(()=>{p.style.animation='';p.style.borderColor='';},500);
+    return;
+  }
+  if(!c.value){
+    c.style.borderColor='rgba(232,67,122,0.7)';
+    setTimeout(()=>c.style.borderColor='',1000);
+    return;
+  }
+  // send to Google Sheets
+  const data={phone:p.value,city:c.value,ts:new Date().toISOString()};
+  fetch(SHEETS_URL,{method:'POST',body:JSON.stringify(data)}).catch(()=>{});
+  setCount(count+1);
+  document.getElementById('sPos').textContent='#'+count;
+  document.getElementById('formBlock').style.display='none';
+  document.getElementById('successBox').classList.add('show');
+}
+
+document.getElementById('phone').addEventListener('input',function(){
+  this.value=this.value.replace(/\D/g,'').slice(0,10);
+  this.style.borderColor='';
+});
+
+function scrollToForm(){
+  document.getElementById('phone').scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(()=>document.getElementById('phone').focus(),500);
+}
+
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target)}});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// REPLACE THIS with your Google Sheets URL after setup
+const SHEETS_URL='YOUR_GOOGLE_SHEETS_WEBHOOK_URL';
+</script>
+</body>
+</html>
